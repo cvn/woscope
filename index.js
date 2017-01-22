@@ -1,5 +1,7 @@
 'use strict';
 
+require('get-float-time-domain-data');
+
 let glslify = require('glslify');
 
 let shadersDict = {
