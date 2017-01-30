@@ -159,7 +159,7 @@ function initAnalysers(ctx, audio) {
 
     // Split the combined channels
     let channelSplitter = audioCtx.createChannelSplitter(2);
-    sourceNode.connect(channelSplitter);
+    sourceNode.connect(gainWorkaround(channelSplitter, audio));
 
     let analysers = [0, 1].map(function (val, index) {
         let analyser = audioCtx.createAnalyser();
@@ -174,6 +174,22 @@ function initAnalysers(ctx, audio) {
 
     channelMerger.connect(audioCtx.destination);
     return analysers;
+}
+
+function gainWorkaround(node, audio) {
+    // Safari: createMediaElementSource causes output to ignore volume slider,
+    // so match gain to slider as a workaround
+    let gainNode;
+    if (audioCtx.constructor.name === 'webkitAudioContext') {
+        gainNode = audioCtx.createGain();
+        audio.onvolumechange = function () {
+            gainNode.gain.value = (audio.muted) ? 0 : audio.volume;
+        };
+        gainNode.connect(node);
+        return gainNode;
+    } else {
+        return node;
+    }
 }
 
 function createShader(gl, vsSource, fsSource) {
