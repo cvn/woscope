@@ -113,11 +113,17 @@ function resetWoscope(woscopeInstance) {
     initWoscope({sourceNode: mySourceNode});
 }
 
+let devicePixelRatio = window.devicePixelRatio || 1;
+
 window.onresize = function () {
     let canvas = $('c'),
         length = Math.min(window.innerHeight, canvas.parentNode.offsetWidth);
-    canvas.width = length;
-    canvas.height = length;
+
+    // high dpi / retina ready - https://www.khronos.org/webgl/wiki/HandlingHighDPI
+    canvas.width = length * devicePixelRatio;
+    canvas.height = length * devicePixelRatio;
+    canvas.style.width = length + 'px';
+    canvas.style.height = length + 'px';
 };
 
 function $(id) { return document.getElementById(id); }
